@@ -1,24 +1,41 @@
-import './style.css'
-import javascriptLogo from './javascript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.js'
+window.onload = async () => {
+  const data = await getData();
+  for (let i = 0; i < data.length; i++) {
+    displayArticle(data[i])
+  }
+}
 
-document.querySelector('#app').innerHTML = `
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-    </a>
-    <h1 class="text-2xl text-shafterpurple font-bold">Hello Vite!</h1>
-    <div class="card">
-      <button id="counter" type="button" class="bg-blue-300 p-4"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite logo to learn more
-    </p>
-  </div>
-`
 
-setupCounter(document.querySelector('#counter'))
+const getData = async () => {
+  try {
+    const data = await fetch("https://egvwmvwxfmpdzylibikc.supabase.co/rest/v1/article?select=*", {
+      headers: {
+        apiKey: import.meta.env.VITE_apiKey,
+      },
+    })
+    if (!data.ok) {
+      throw new Error(`Response status: ${response.status}`);
+    }
+    return data.json();
+  } catch (err) {
+    console.error(err.message);
+  }
+
+}
+
+const displayArticle = (articleObj) => {
+  const app = document.getElementById('app')
+  const articleDiv = document.createElement('div')
+
+  const articleParagraph = document.createElement('p')
+  articleParagraph.setAttribute('style', 'white-space: pre;');
+
+  articleParagraph.textContent = `Tytuł: ${articleObj.title} \r\n `
+  articleParagraph.textContent += `Podtytuł: ${articleObj.subtitle} \r\n`
+  articleParagraph.textContent += `Author: ${articleObj.author} \r\n`
+  articleParagraph.textContent += `Data utworzenia: ${articleObj.created_at} \r\n`
+  articleParagraph.textContent += `Zawartość: ${articleObj.content} \r\n `;
+  articleDiv.appendChild(articleParagraph);
+
+  app.appendChild(articleDiv)
+}
